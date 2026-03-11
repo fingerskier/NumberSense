@@ -14,34 +14,33 @@ function checkAnswer(problem, userAnswer) {
   // Exact match
   if (ua === expected) return 'correct'
 
-  // Numeric comparison for number answers
-  const uaNum = parseFloat(ua)
-  const expNum = typeof problem.answer === 'number' ? problem.answer : parseFloat(expected)
-  if (!isNaN(uaNum) && !isNaN(expNum) && Math.abs(uaNum - expNum) < 0.001) return 'correct'
-
-  // For fraction answers, also check answerNum
-  if (problem.answerNum !== undefined && !isNaN(uaNum)) {
-    if (Math.abs(uaNum - problem.answerNum) < 0.001) return 'correct'
-  }
-
-  // Allow fraction equivalence: user types "1/2" for answer "1/2"
-  // Parse fraction from user input
+  // Parse user input as fraction or mixed number first
   const fracMatch = ua.match(/^(-?\d+)\s*\/\s*(\d+)$/)
-  if (fracMatch) {
-    const uFrac = parseInt(fracMatch[1]) / parseInt(fracMatch[2])
-    if (problem.answerNum !== undefined && Math.abs(uFrac - problem.answerNum) < 0.001)
-      return 'correct'
-    if (!isNaN(expNum) && Math.abs(uFrac - expNum) < 0.001) return 'correct'
-  }
-
-  // Mixed number: "1 1/2"
   const mixedMatch = ua.match(/^(-?\d+)\s+(\d+)\s*\/\s*(\d+)$/)
+
+  let userNumericValue = null
+
   if (mixedMatch) {
     const whole = parseInt(mixedMatch[1])
     const frac = parseInt(mixedMatch[2]) / parseInt(mixedMatch[3])
-    const uVal = whole >= 0 ? whole + frac : whole - frac
-    if (problem.answerNum !== undefined && Math.abs(uVal - problem.answerNum) < 0.001)
+    userNumericValue = whole >= 0 ? whole + frac : whole - frac
+  } else if (fracMatch) {
+    userNumericValue = parseInt(fracMatch[1]) / parseInt(fracMatch[2])
+  } else {
+    const parsed = parseFloat(ua)
+    if (!isNaN(parsed)) userNumericValue = parsed
+  }
+
+  // Compare numerically using answerNum (preferred) or parsed expected value
+  if (userNumericValue !== null) {
+    if (problem.answerNum !== undefined && Math.abs(userNumericValue - problem.answerNum) < 0.001)
       return 'correct'
+
+    // Only use parseFloat on expected when it doesn't contain a fraction
+    const expNum = typeof problem.answer === 'number'
+      ? problem.answer
+      : (!expected.includes('/') ? parseFloat(expected) : NaN)
+    if (!isNaN(expNum) && Math.abs(userNumericValue - expNum) < 0.001) return 'correct'
   }
 
   return 'incorrect'

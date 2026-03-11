@@ -23,7 +23,6 @@ npm run dev
 
 ```bash
 npm run build      # builds to dist/
-npm run deploy     # deploys to gh-pages branch
 ```
 
-Automatic deployment via GitHub Actions on push to `main`.
+Deployment is automatic via GitHub Actions on push to `main`.
