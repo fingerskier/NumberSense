@@ -1,7 +1,12 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export default function Timer({ seconds, onTimeUp, running }) {
   const [remaining, setRemaining] = useState(seconds)
+  const onTimeUpRef = useRef(onTimeUp)
+
+  useEffect(() => {
+    onTimeUpRef.current = onTimeUp
+  }, [onTimeUp])
 
   useEffect(() => {
     setRemaining(seconds)
@@ -10,14 +15,14 @@ export default function Timer({ seconds, onTimeUp, running }) {
   useEffect(() => {
     if (!running) return
     if (remaining <= 0) {
-      onTimeUp()
+      onTimeUpRef.current()
       return
     }
     const id = setInterval(() => {
       setRemaining((r) => {
         if (r <= 1) {
           clearInterval(id)
-          onTimeUp()
+          onTimeUpRef.current()
           return 0
         }
         return r - 1

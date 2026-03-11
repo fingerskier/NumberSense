@@ -1,4 +1,4 @@
-import { randInt, pick, gcd, simplify, fmtFrac } from './utils.js'
+import { randInt, pick, simplify, fmtFrac } from './utils.js'
 
 // ─── Problem generators ───────────────────────────────────────────────
 // Each generator returns { question: string, answer: number|string }
