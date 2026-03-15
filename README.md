@@ -24,5 +24,3 @@ npm run dev
 ```bash
 npm run build      # builds to dist/
 ```
-
-Deployment is automatic via GitHub Actions on push to `main`.
